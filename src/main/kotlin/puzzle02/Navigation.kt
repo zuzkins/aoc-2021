@@ -12,6 +12,10 @@ data class Navigation(val horizontalPosition: Int = 0, val verticalPosition: Int
         fun List<NavigationInstruction>.move() = this.fold(Navigation()) { nav, instruction ->
             nav.move(instruction)
         }
+
+        fun List<NavigationInstruction>.moveWithAim() = this.fold(NavigationWithAim()) { nav, instruction ->
+            nav.move(instruction)
+        }
     }
 }
 
