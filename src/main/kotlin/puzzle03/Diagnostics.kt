@@ -14,6 +14,10 @@ data class Report(val lines: List<Int>, val magnitude: Int) {
         Diagnostics(gamma, gamma.toEpsilon(magnitude))
     }
 
+    val lifeSupport by lazy {
+        findO2GeneratorRating() * findCO2Rating()
+    }
+
     fun computeGamma(): Int {
         val inputCount = lines.size
         val threshold = inputCount / 2
@@ -35,6 +39,16 @@ data class Report(val lines: List<Int>, val magnitude: Int) {
             }
         }
         return result
+    }
+
+    fun findO2GeneratorRating(): Int {
+        return DiagnosticsUtils.filterReportLines(this, this.magnitude - 1) { it.computeGamma() }
+    }
+
+    fun findCO2Rating(): Int {
+        return DiagnosticsUtils.filterReportLines(this, this.magnitude - 1) {
+            it.diagnostics.epsilon
+        }
     }
 }
 
@@ -60,24 +74,17 @@ object DiagnosticsUtils {
 
     fun Int.toEpsilon(magnitude: Int) = "1".repeat(magnitude).intFromBinary() xor this
 
-    fun findO2GeneratorRating(report: Report): Int {
-        return filterReportLines(report, report.computeGamma(), report.magnitude - 1)
-    }
 
-    fun filterReportLines(report: Report, filter: Int, maskPos: Int): Int {
+    fun filterReportLines(report: Report, maskPos: Int, filterProvider: (Report) -> Int): Int {
+        val filter = filterProvider(report)
         val lines = report.lines
         val mask = 1 shl maskPos
         val maskFilter = filter and mask
-        println("pos: $maskPos")
-        println("\tmask: ${Integer.toBinaryString(maskFilter)}")
         val remaining = lines.filter { line ->
             val matches = (line and mask) == maskFilter
             matches
         }
 
-        remaining.forEach {
-            println("\tKeeping: ${Integer.toBinaryString(it)}")
-        }
         if (remaining.size == 1) {
             return remaining.first()
         }
@@ -86,6 +93,6 @@ object DiagnosticsUtils {
             "Expected to find a match, but haven't"
         }
         val newReport = Report(remaining, report.magnitude)
-        return filterReportLines(newReport, report.computeGamma(), newMaskPos)
+        return filterReportLines(newReport, newMaskPos, filterProvider)
     }
 }

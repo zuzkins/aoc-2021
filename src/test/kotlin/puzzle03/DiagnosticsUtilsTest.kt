@@ -5,7 +5,6 @@ import Utils.readLinesFromResource
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.jupiter.api.Test
-import puzzle03.DiagnosticsUtils.findO2GeneratorRating
 import puzzle03.DiagnosticsUtils.parseDiagnosticReport
 import puzzle03.DiagnosticsUtils.toEpsilon
 
@@ -55,6 +54,7 @@ internal class DiagnosticsUtilsTest {
     }
 
     val testExample = listOf(
+        "00100",
         "11110",
         "10110",
         "10111",
@@ -137,7 +137,27 @@ internal class DiagnosticsUtilsTest {
     @Test
     fun `can find o2 generator value`() {
         val report = testExample.parseDiagnosticReport()
-        val o2Value = findO2GeneratorRating(report)
+        val o2Value = report.findO2GeneratorRating()
         assertThat(o2Value).isEqualTo(23)
+    }
+
+    @Test
+    fun `can find co2 rating`() {
+        val report = testExample.parseDiagnosticReport()
+        val co2Value = report.findCO2Rating()
+        assertThat(co2Value).isEqualTo(10)
+    }
+
+    @Test
+    fun `can find life support rating`() {
+        val report = testExample.parseDiagnosticReport()
+        assertThat(report.lifeSupport).isEqualTo(230)
+    }
+
+    @Test
+    fun `puzzle solution life support`() {
+        val lines = readLinesFromResource("/puzzle03/input")
+        val report = lines.parseDiagnosticReport()
+        assertThat(report.lifeSupport).isEqualTo(2555739)
     }
 }
