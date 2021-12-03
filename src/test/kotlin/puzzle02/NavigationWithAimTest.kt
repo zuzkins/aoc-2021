@@ -1,12 +1,10 @@
 package puzzle02
 
+import Utils.readLinesFromResource
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import puzzle02.Navigation.Companion.move
 import puzzle02.Navigation.Companion.moveWithAim
 import puzzle02.NavigationUtils.parseInstructions
-import java.io.BufferedReader
 
 internal class NavigationWithAimTest {
     @Test
@@ -30,10 +28,7 @@ internal class NavigationWithAimTest {
 
     @Test
     fun `puzzle solution`() {
-        val lines = this::class.java.getResourceAsStream("/puzzle02/input")!!
-            .bufferedReader()
-            .use(BufferedReader::readText)
-            .lines()
+        val lines = readLinesFromResource("/puzzle02/input")
 
         val positionSum = lines.parseInstructions().moveWithAim().positionSum
         assertThat(positionSum).isEqualTo(1813062561)
