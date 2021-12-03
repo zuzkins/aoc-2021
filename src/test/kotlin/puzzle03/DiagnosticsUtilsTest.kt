@@ -5,6 +5,7 @@ import Utils.readLinesFromResource
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.jupiter.api.Test
+import puzzle03.DiagnosticsUtils.findO2GeneratorRating
 import puzzle03.DiagnosticsUtils.parseDiagnosticReport
 import puzzle03.DiagnosticsUtils.toEpsilon
 
@@ -42,15 +43,15 @@ internal class DiagnosticsUtilsTest {
     }
 
     @Test
-    fun `can determine most common count correctly`() {
-        val gamma = listOf("00100", "10100").parseDiagnosticReport().computeGamma()
-        assertThat(gamma).isEqualTo("00100".intFromBinary())
-    }
-
-    @Test
     fun `can compute slightly complicated gamma`() {
         val gamma = listOf("00100", "10100", "11111").parseDiagnosticReport().computeGamma()
         assertThat(gamma).isEqualTo("10100".intFromBinary())
+    }
+
+    @Test
+    fun `can compute gamma with exactly same count`() {
+        val gamma = listOf("0", "1").parseDiagnosticReport().computeGamma()
+        assertThat(gamma).isEqualTo(1)
     }
 
     val testExample = listOf(
@@ -130,5 +131,13 @@ internal class DiagnosticsUtilsTest {
         assertThat(Integer.toBinaryString(diagnostics.gamma)).isEqualTo("100111000110")
         assertThat(Integer.toBinaryString(diagnostics.epsilon)).isEqualTo("11000111001")
         assertThat(diagnostics.powerConsumption).isEqualTo(3985686)
+    }
+
+
+    @Test
+    fun `can find o2 generator value`() {
+        val report = testExample.parseDiagnosticReport()
+        val o2Value = findO2GeneratorRating(report)
+        assertThat(o2Value).isEqualTo(23)
     }
 }

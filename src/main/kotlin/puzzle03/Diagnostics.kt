@@ -16,7 +16,8 @@ data class Report(val lines: List<Int>, val magnitude: Int) {
 
     fun computeGamma(): Int {
         val inputCount = lines.size
-        val threshold = inputCount / 2.0
+        val threshold = inputCount / 2
+        val isEven = lines.size % 2 == 0
         var result = 0
         repeat(magnitude) { pos ->
             val mask = 1 shl pos
@@ -27,7 +28,9 @@ data class Report(val lines: List<Int>, val magnitude: Int) {
                     ones
                 }
             }
-            if (onesCount > threshold) {
+            if (isEven && onesCount == threshold) {
+                result = result or mask
+            } else if (onesCount > threshold) {
                 result = result or mask
             }
         }
@@ -56,4 +59,33 @@ object DiagnosticsUtils {
     }
 
     fun Int.toEpsilon(magnitude: Int) = "1".repeat(magnitude).intFromBinary() xor this
+
+    fun findO2GeneratorRating(report: Report): Int {
+        return filterReportLines(report, report.computeGamma(), report.magnitude - 1)
+    }
+
+    fun filterReportLines(report: Report, filter: Int, maskPos: Int): Int {
+        val lines = report.lines
+        val mask = 1 shl maskPos
+        val maskFilter = filter and mask
+        println("pos: $maskPos")
+        println("\tmask: ${Integer.toBinaryString(maskFilter)}")
+        val remaining = lines.filter { line ->
+            val matches = (line and mask) == maskFilter
+            matches
+        }
+
+        remaining.forEach {
+            println("\tKeeping: ${Integer.toBinaryString(it)}")
+        }
+        if (remaining.size == 1) {
+            return remaining.first()
+        }
+        val newMaskPos = maskPos - 1
+        check(maskPos >= 0) {
+            "Expected to find a match, but haven't"
+        }
+        val newReport = Report(remaining, report.magnitude)
+        return filterReportLines(newReport, report.computeGamma(), newMaskPos)
+    }
 }
