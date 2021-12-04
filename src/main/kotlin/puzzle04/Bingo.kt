@@ -50,21 +50,30 @@ data class WinningBoard(val board: Board, val winningDraw: List<Int>) {
 
 data class Bingo(val boards: List<Board>, val draw: List<Int>) {
 
-    fun findWinner(): WinningBoard {
+    fun findAllWinners(): List<WinningBoard> {
+        var remainingBoards = boards
+        var winners = listOf<WinningBoard>()
         var currentDraw = draw.take(5)
         var drawToTry = draw.drop(5)
 
-
-        while (drawToTry.isNotEmpty()) {
+        while (drawToTry.isNotEmpty() && remainingBoards.isNotEmpty()) {
             currentDraw = currentDraw + drawToTry.first()
             drawToTry = drawToTry.drop(1)
-            val winner = boards.find { it.wins(currentDraw) }
-            if (winner != null) {
-                println("Winner found with draw: ${currentDraw.joinToString(", ")}")
-                return WinningBoard(winner, currentDraw)
+
+            val currentWinners = remainingBoards.filter { it.wins(currentDraw) }
+            currentWinners.forEach { winner ->
+                winners = winners + WinningBoard(winner, currentDraw)
+                remainingBoards = remainingBoards - winner
             }
         }
-        error("No winner found for draw: $draw")
+        check(winners.isNotEmpty()) {
+            "No winner found for draw: $draw"
+        }
+        return winners
+    }
+
+    fun findWinner(): WinningBoard {
+        return findAllWinners().first()
     }
 
     companion object {

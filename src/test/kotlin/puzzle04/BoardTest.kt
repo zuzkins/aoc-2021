@@ -256,4 +256,19 @@ internal class BoardTest {
         val bingo = Bingo.parse(input)
         assertThat(bingo.findWinner().score).isEqualTo(35670)
     }
+
+    @Test
+    fun `can find last winner`() {
+        val last = Bingo.parse(exampleTest).findAllWinners().last()
+        assertThat(last.score).isEqualTo(1924)
+        assertThat(last.winningDraw).isEqualTo(listOf(7, 4, 9, 5, 11, 17, 23, 2, 0, 14, 21, 24, 10, 16, 13))
+    }
+
+    @Test
+    fun `puzzle solution 2`() {
+        val input = readResource("/puzzle04/input")
+        val bingo = Bingo.parse(input)
+        val winners = bingo.findAllWinners()
+        assertThat(winners.last().score).isEqualTo(22704)
+    }
 }
