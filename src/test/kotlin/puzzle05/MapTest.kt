@@ -81,6 +81,6 @@ internal class MapTest {
         val lines = points.map { DirectLine(it.first, it.second) }
         val finalMap = puzzleMap.markLines(lines)
 
-        assertThat(finalMap.score).isEqualTo(5)
+        assertThat(finalMap.score).isEqualTo(7644)
     }
 }
