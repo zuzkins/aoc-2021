@@ -83,4 +83,41 @@ internal class MapTest {
 
         assertThat(finalMap.score).isEqualTo(7644)
     }
+
+    @Test
+    fun `example solution 2`() {
+        val points = exampleInput.lines().map(::parsePoints)
+        val puzzleMap = PuzzleMap.createLargeEnoughFor(points)
+        val lines = points.map { DirectOrDiagonalLine(it.first, it.second) }
+
+        val finalMap = puzzleMap.markLines(lines)
+
+        assertThat(finalMap.toString()).isEqualTo(
+            """
+            Map:
+            1 0 1 0 0 0 0 1 1 0 
+            0 1 1 1 0 0 0 2 0 0 
+            0 0 2 0 1 0 1 1 1 0 
+            0 0 0 1 0 2 0 2 0 0 
+            0 1 1 2 3 1 3 2 1 1 
+            0 0 0 1 0 2 0 0 0 0 
+            0 0 1 0 0 0 1 0 0 0 
+            0 1 0 0 0 0 0 1 0 0 
+            1 0 0 0 0 0 0 0 1 0 
+            2 2 2 1 1 1 0 0 0 0 
+        """.trimIndent()
+        )
+        assertThat(finalMap.score).isEqualTo(12)
+    }
+
+    @Test
+    fun `puzzle solution 2`() {
+        val input = Utils.readResource("/puzzle05/input")
+        val points = input.lines().map(::parsePoints)
+        val puzzleMap = PuzzleMap.createLargeEnoughFor(points)
+        val lines = points.map { DirectOrDiagonalLine(it.first, it.second) }
+        val finalMap = puzzleMap.markLines(lines)
+
+        assertThat(finalMap.score).isEqualTo(18627)
+    }
 }

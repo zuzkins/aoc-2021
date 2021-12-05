@@ -1,18 +1,52 @@
 package puzzle05
 
 import puzzle05.MapUtil.makeSeq
+import kotlin.math.abs
 
 typealias Point = Pair<Int, Int>
 
-data class DirectLine(val from: Point, val to: Point) {
-    val points: List<Point> by lazy {
-        if (from.first != to.first && from.second != to.second) {
+interface Line {
+    val points: List<Point>
+}
+
+data class DirectLine(val from: Point, val to: Point) : Line {
+    override val points: List<Point> by lazy {
+        if (!isDirectLine(from, to)) {
             return@lazy emptyList<Point>()
         }
 
         val xs = makeSeq(from.first, to.first)
         val ys = makeSeq(from.second, to.second)
         xs.zip(ys).map { (x, y) -> Point(x, y) }
+    }
+
+    companion object {
+        fun isDirectLine(from: Point, to: Point) = from.first == to.first || from.second == to.second
+    }
+}
+
+data class DirectOrDiagonalLine(val from: Point, val to: Point) : Line {
+    override val points: List<Point> by lazy {
+        if (DirectLine.isDirectLine(from, to)) {
+            return@lazy DirectLine(from, to).points
+        } else if (!isSquare(from, to)) {
+            return@lazy emptyList()
+        }
+
+        val dx = sig(to.first - from.first)
+        val dy = sig(to.second - from.second)
+
+        (0..Math.abs(from.first - to.first)).map { offset ->
+            Point(from.first + offset * dx, from.second + offset * dy)
+        }
+    }
+
+    companion object {
+        fun isSquare(from: Point, to: Point): Boolean {
+            return abs(from.first - to.first) == abs(from.second - to.second)
+        }
+
+        fun sig(i: Int) = if (i < 0) -1 else 1
     }
 }
 
@@ -47,7 +81,7 @@ data class PuzzleMap(val m: List<List<Int>>) : List<List<Int>> by m {
         return sb.toString()
     }
 
-    fun markLines(lines: List<DirectLine>): PuzzleMap {
+    fun markLines(lines: List<Line>): PuzzleMap {
         return lines.flatMap { it.points }.fold(this) { m, p ->
             m.markPoint(p)
         }
@@ -64,7 +98,7 @@ data class PuzzleMap(val m: List<List<Int>>) : List<List<Int>> by m {
 
         fun createLargeEnoughFor(points: List<Pair<Point, Point>>): PuzzleMap {
             val max = points.flatMap { (f, s) -> listOf(f.first, f.second, s.first, s.second) }.maxOrNull() ?: 0
-            return PuzzleMap.create(max)
+            return create(max)
         }
     }
 }
