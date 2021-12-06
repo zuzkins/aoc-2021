@@ -66,4 +66,17 @@ internal class LanterfishTest {
         val population = 80.daysOf(input)
         assertThat(population.countFish()).isEqualTo(354564)
     }
+
+    @Test
+    fun `example solution 2`() {
+        val population80 = 256.daysOf(exampleInput)
+        assertThat(population80.countFish()).isEqualTo(26984457539)
+    }
+
+    @Test
+    fun `puzzle solution 2`() {
+        val input = Utils.readResource("/puzzle06/input").split(",").map { it.toInt() }.asPopulation()
+        val population = 256.daysOf(input)
+        assertThat(population.countFish()).isEqualTo(1609058859115)
+    }
 }
