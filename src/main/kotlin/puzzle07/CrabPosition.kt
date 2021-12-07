@@ -17,7 +17,7 @@ data class AdvancedCrabTechnology(private val crabs: List<Int>) : List<Int> by c
 
     override fun countFuelCostToMoveTo(position: Int) = crabs.fold(0L) { totalFuelCost, crab ->
         val distance = abs(position - crab)
-        val fuelCost = fuelCosts.drop(distance).first()
+        val fuelCost = fuelCosts.get(distance)
         totalFuelCost + fuelCost
     }
 
