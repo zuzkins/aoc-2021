@@ -2,14 +2,15 @@ package puzzle07
 
 import kotlin.math.abs
 
-object CrabPosition {
-
-    fun List<Int>.countFuelCostToMoveTo(position: Int) = fold(0L) { totalFuelCost, crab ->
+data class SimpleCrabTechnology(private val crabs: List<Int>) : List<Int> by crabs {
+    fun countFuelCostToMoveTo(position: Int) = fold(0L) { totalFuelCost, crab ->
         val fuelCost = abs(position - crab)
         totalFuelCost + fuelCost
     }
+}
 
-    fun List<Int>.findBestPosition(): Pair<Int, Long> {
+object CrabPosition {
+    fun SimpleCrabTechnology.findBestPosition(): Pair<Int, Long> {
         if (isEmpty()) error("no solution for empty crab crew")
 
         val max = maxOrNull() ?: 0
