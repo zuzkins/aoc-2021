@@ -3,6 +3,7 @@ package puzzle07
 import Utils
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import puzzle07.AdvancedCrabTechnology.Companion.generateFuelCost
 import puzzle07.CrabPosition.findBestPosition
 
 internal class CrabPositionTest {
@@ -58,5 +59,20 @@ internal class CrabPositionTest {
     @Test
     fun `puzzle 1 solution`() {
         assertThat(SimpleCrabTechnology(puzzleInput()).findBestPosition()).isEqualTo(367 to 356179L)
+    }
+
+    @Test
+    fun `can generate advanced fuel cost`() {
+        assertThat(generateFuelCost().take(4).toList()).isEqualTo(listOf(0, 1, 3, 6))
+    }
+
+    @Test
+    fun `example 2 solution`() {
+        assertThat(AdvancedCrabTechnology(exampleCrabs).findBestPosition()).isEqualTo(5 to 168L)
+    }
+
+    @Test
+    fun `puzzle 2 solution`() {
+        assertThat(AdvancedCrabTechnology(puzzleInput()).findBestPosition()).isEqualTo(489 to 99788435L)
     }
 }
