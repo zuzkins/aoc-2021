@@ -1,9 +1,15 @@
 package puzzle09
 
+data class Spot(val x: Int, val y: Int, val height: Int) : Comparable<Spot> {
+    override fun compareTo(other: Spot): Int {
+        return height.compareTo(other.height)
+    }
+}
+
 object Levels {
 
-    fun List<List<Int>>.findLowestLevels(): List<Int> {
-        val result = mutableListOf<Int>()
+    fun List<List<Int>>.findLowestLevels(): List<Spot> {
+        val result = mutableListOf<Spot>()
         check(isNotEmpty()) {
             "Heights must not be empty"
         }
@@ -25,15 +31,16 @@ object Levels {
         return result
     }
 
-    fun List<Int>.computeRiskLevel() = fold(0) { risk, cur ->
-        risk + cur + 1
+    fun List<Spot>.computeRiskLevel() = fold(0) { risk, cur ->
+        risk + cur.height + 1
     }
 
-    fun List<List<Int>>.mayBeGet(x: Int, y: Int): Int {
-        if (y < 0 || y >= this.size) return Integer.MAX_VALUE
+    fun List<List<Int>>.mayBeGet(x: Int, y: Int, defaultValue: Int = Integer.MAX_VALUE): Spot {
+        val defaultResult = Spot(x, y, defaultValue)
+        if (y < 0 || y >= this.size) return defaultResult
         val row = this[y]
-        if (x < 0 || x >= row.size) return Integer.MAX_VALUE
-        return row[x]
+        if (x < 0 || x >= row.size) return defaultResult
+        return defaultResult.copy(height = row[x])
     }
 
     fun String.asLevels(): List<List<Int>> = lines().map { line -> line.toCharArray().map { it.digitToInt() } }

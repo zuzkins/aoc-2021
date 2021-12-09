@@ -5,12 +5,13 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import puzzle09.Levels.asLevels
 import puzzle09.Levels.computeRiskLevel
+import puzzle09.Levels.findBasin
 import puzzle09.Levels.findLowestLevels
 
 internal class LevelsTest {
     @Test
     fun `single number is a low spot`() {
-        assertThat(listOf(listOf(1)).findLowestLevels()).isEqualTo(listOf(1))
+        assertThat(listOf(listOf(1)).findLowestLevels()).isEqualTo(listOf(Spot(x = 0, y = 0, height = 1)))
     }
 
     @Test
@@ -29,7 +30,14 @@ internal class LevelsTest {
     @Test
     fun `example solution 1`() {
         val lowestLevels = exampleInput.asLevels().findLowestLevels()
-        assertThat(lowestLevels).isEqualTo(listOf(1, 0, 5, 5))
+        assertThat(lowestLevels).isEqualTo(
+            listOf(
+                Spot(1, 0, 1),
+                Spot(9, 0, 0),
+                Spot(2, 2, 5),
+                Spot(6, 4, 5)
+            )
+        )
         assertThat(lowestLevels.computeRiskLevel()).isEqualTo(15)
     }
 
@@ -37,5 +45,18 @@ internal class LevelsTest {
     fun `puzzle solution 1`() {
         val lowestLevels = Utils.readResource("/puzzle09/input").asLevels().findLowestLevels()
         assertThat(lowestLevels.computeRiskLevel()).isEqualTo(452)
+    }
+
+    @Test
+    fun `can find single basin`() {
+        val levels = exampleInput.asLevels()
+        val basin = levels.findBasin(Spot(1, 0, 1))
+        assertThat(basin).isEqualTo(
+            listOf(
+                Spot(1, 0, 1),
+                Spot(0, 0, 2),
+                Spot(0, 1, 3)
+            )
+        )
     }
 }
