@@ -31,6 +31,30 @@ object Levels {
         return result
     }
 
+    fun List<List<Int>>.findBasin(spot: Spot): List<Spot> {
+        check(this.isNotEmpty()) {
+            "Cannot find basin without data"
+        }
+        val left = mayBeGet(spot.x - 1, spot.y, -1)
+        val right = mayBeGet(spot.x + 1, spot.y, -1)
+        val top = mayBeGet(spot.x, spot.y - 1, -1)
+        val bottom = mayBeGet(spot.x, spot.y + 1, -1)
+
+        return listOf(left, right, top, bottom).filter { it > spot && it.height < 9 }
+            .fold(listOf(spot)) { result, cur ->
+                result + findBasin(cur)
+            }.toSet().toList()
+    }
+
+    fun List<List<Int>>.findAllBasins(): List<List<Spot>> {
+        val spots = this.findLowestLevels()
+        return spots.map { findBasin(it) }
+    }
+
+    fun List<List<Spot>>.countScore() = fold(1) { score, basin ->
+        score * basin.size
+    }
+
     fun List<Spot>.computeRiskLevel() = fold(0) { risk, cur ->
         risk + cur.height + 1
     }
