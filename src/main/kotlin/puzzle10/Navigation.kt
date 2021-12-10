@@ -12,11 +12,24 @@ sealed class ParserResult {
             }
     }
 
-    object Incomplete : ParserResult()
+    data class Incomplete(val expecting: List<Char>) : ParserResult() {
+        val score = expecting.fold(0L) { s, ch ->
+            s * 5 + when (ch) {
+                ')' -> 1
+                ']' -> 2
+                '}' -> 3
+                '>' -> 4
+                else -> error("Invalid expected character '$ch'")
+            }
+        }
+    }
+
     object Correct : ParserResult()
 }
 
 object Navigation {
+
+    fun String.toChars() = toCharArray().toList()
 
     fun String.tryParse(): ParserResult {
         var expecting = listOf<Char>()
@@ -37,7 +50,7 @@ object Navigation {
             }
         }
         return if (expecting.isNotEmpty()) {
-            ParserResult.Incomplete
+            ParserResult.Incomplete(expecting = expecting)
         } else {
             ParserResult.Correct
         }
