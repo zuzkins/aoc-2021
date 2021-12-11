@@ -177,6 +177,34 @@ internal class OctopusesTest {
         assertThat(flashed.size).isEqualTo(1642)
     }
 
+    @Test
+    fun `example solution 2`() {
+        val firstFlashedAll = makeSequenceForLevels(exampleInput()).indexOfFirst { (_, flashed) ->
+            flashed.size == 100
+        } + 1
+
+        assertThat(firstFlashedAll).isEqualTo(195)
+    }
+
+    @Test
+    fun `puzzle solution 2`() {
+        val initial = from(readResource("/puzzle11/input"))
+        val firstFlashedAll = makeSequenceForLevels(initial).indexOfFirst { (_, flashed) ->
+            flashed.size == 100
+        } + 1
+
+        assertThat(firstFlashedAll).isEqualTo(320)
+    }
+
+    private fun makeSequenceForLevels(initial: Array<IntArray>): Sequence<Pair<Array<IntArray>, Set<Pair<Int, Int>>>> {
+        var levels = initial
+        return generateSequence {
+            val next = levels.nextStep()
+            levels = next.first
+            next
+        }
+    }
+
     private fun steps(initialLevels: Array<IntArray>) =
         (0 until 100).fold(initialLevels to emptyList<Pair<Int, Int>>()) { acc, _ ->
             val (input, flashed) = acc
