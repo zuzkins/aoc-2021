@@ -143,4 +143,56 @@ internal class PathFindingTest {
         val connections = PathFinding.parse(puzzleInput)
         assertThat(connections.paths()).hasSize(5333)
     }
+
+    @Test
+    fun `can revisit small cave`() {
+        val connections = PathFinding.parse(exampleInput)
+        assertThat(connections.paths(allowSmallCaveRevisit = true)).containsAll(
+            """
+            start,A,b,A,b,A,c,A,end
+            start,A,b,A,b,A,end
+            start,A,b,A,b,end
+            start,A,b,A,c,A,b,A,end
+            start,A,b,A,c,A,b,end
+            start,A,b,A,c,A,c,A,end
+            start,A,b,A,c,A,end
+            start,A,b,A,end
+            start,A,b,d,b,A,c,A,end
+            start,A,b,d,b,A,end
+            start,A,b,d,b,end
+            start,A,b,end
+            start,A,c,A,b,A,b,A,end
+            start,A,c,A,b,A,b,end
+            start,A,c,A,b,A,c,A,end
+            start,A,c,A,b,A,end
+            start,A,c,A,b,d,b,A,end
+            start,A,c,A,b,d,b,end
+            start,A,c,A,b,end
+            start,A,c,A,c,A,b,A,end
+            start,A,c,A,c,A,b,end
+            start,A,c,A,c,A,end
+            start,A,c,A,end
+            start,A,end
+            start,b,A,b,A,c,A,end
+            start,b,A,b,A,end
+            start,b,A,b,end
+            start,b,A,c,A,b,A,end
+            start,b,A,c,A,b,end
+            start,b,A,c,A,c,A,end
+            start,b,A,c,A,end
+            start,b,A,end
+            start,b,d,b,A,c,A,end
+            start,b,d,b,A,end
+            start,b,d,b,end
+            start,b,end
+            """.trimIndent().lines()
+        )
+    }
+
+    @Test
+    fun `puzzle solution 2`() {
+        val connections = PathFinding.parse(puzzleInput)
+        val paths = connections.paths(allowSmallCaveRevisit = true)
+        assertThat(paths).hasSize(146553)
+    }
 }
