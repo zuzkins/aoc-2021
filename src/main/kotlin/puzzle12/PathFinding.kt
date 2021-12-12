@@ -20,7 +20,7 @@ object PathFinding {
             return listOf(listOf(newPath.joinToString(",")))
         }
         // we already have been in this small cave so this path is no good
-        if (point != "start" && point.all { it.isLowerCase() } && currentPath.contains(point)) {
+        if (visitForbidden(point, currentPath)) {
             return emptyList()
         }
         val conns = connections[point] ?: error("Cannot move from point $point at path: $newPath")
@@ -28,6 +28,15 @@ object PathFinding {
             findPaths(connections, nextPoint, newPath)
         }
         return allConnections
+    }
+
+    private fun visitForbidden(
+        point: String,
+        currentPath: List<String>
+    ) = when {
+        point == "start" -> false
+        point.any { it.isUpperCase() } -> false
+        else -> currentPath.contains(point)
     }
 
     fun parse(input: String) = input.lines().fold(mapOf<String, List<String>>()) { connections, line ->
