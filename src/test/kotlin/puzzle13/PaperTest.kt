@@ -134,5 +134,24 @@ internal class PaperTest {
         assertThat(dots.size).isEqualTo(785)
     }
 
+    @Test
+    fun `puzzle solution 2`() {
+        val paper = puzzlePaper()
+            .foldAlongX(655)
+            .foldAlongY(447)
+            .foldAlongX(327)
+            .foldAlongY(223)
+            .foldAlongX(163)
+            .foldAlongY(111)
+            .foldAlongX(81)
+            .foldAlongY(55)
+            .foldAlongX(40)
+            .foldAlongY(27)
+            .foldAlongY(13)
+            .foldAlongY(6)
+
+        println("--------------\n${paper.print()}")
+    }
+
     private fun examplePaper() = PaperUtil.parse(exampleInput)
 }
