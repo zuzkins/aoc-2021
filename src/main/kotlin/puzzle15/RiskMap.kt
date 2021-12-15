@@ -65,10 +65,12 @@ object RiskMapUtils {
             }
         }
 
+        // copy the original map into the 0,0 sector
         mapIndicies.forEach { (y, x) ->
             newMap[y][x] = this[y][x]
         }
 
+        // fill in first row of copies of the original
         (1 until 5).forEach { column ->
             mapIndicies.forEach { (x, y) ->
                 val dx = originalXSize * column
@@ -79,6 +81,7 @@ object RiskMapUtils {
         }
         val newXIndices = newMap.first().indices
 
+        // fill remaining rows - incrementing the number from the previous row on the same y position
         (1 until 5).forEach { step ->
             indices.forEach { origY ->
                 newXIndices.forEach { x ->
