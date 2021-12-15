@@ -30,7 +30,7 @@ object RiskMapUtils {
         while (candidatesToVisit.isNotEmpty()) {
             val (cur, _) = candidatesToVisit.poll()
             alreadyVisited += cur
-            neighbours.map { (dx, dy) ->
+            neighbours.asSequence().map { (dx, dy) ->
                 val x = cur.first + dx
                 val y = cur.second + dy
                 x to y
@@ -43,7 +43,8 @@ object RiskMapUtils {
             }.filter { (point, distance) ->
                 distance < distances[point.second][point.first]
             }.forEach { pWithDistance ->
-                distances[pWithDistance.first.second][pWithDistance.first.first] = pWithDistance.second
+                val (point, distance) = pWithDistance
+                distances[point.second][point.first] = distance
                 candidatesToVisit += pWithDistance
             }
         }
