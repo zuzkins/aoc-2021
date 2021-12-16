@@ -53,7 +53,7 @@ internal class PacketsTest {
 
     @Test
     fun `can parse example sub packet 1`() {
-        val packets = Packets.parseInput("8A004A801A8002F478").parse()
+        val packets = parseWholePacket("8A004A801A8002F478")
         assertThat(packets).isEqualTo(
             listOf(
                 Packet.SubPacket(
@@ -84,19 +84,19 @@ internal class PacketsTest {
 
     @Test
     fun `can parse example sub packet 2`() {
-        val packets = Packets.parseInput("620080001611562C8802118E34").parse()
+        val packets = parseWholePacket("620080001611562C8802118E34")
         assertThat(packets.sumOf { it.packetVersionSum }).isEqualTo(12)
     }
 
     @Test
     fun `can parse example sub packet 3`() {
-        val packets = Packets.parseInput("C0015000016115A2E0802F182340").parse()
+        val packets = parseWholePacket("C0015000016115A2E0802F182340")
         assertThat(packets.sumOf { it.packetVersionSum }).isEqualTo(23)
     }
 
     @Test
     fun `can parse example sub packet 4`() {
-        val packets = Packets.parseInput("A0016C880162017C3686B18A3D4780").parse()
+        val packets = parseWholePacket("A0016C880162017C3686B18A3D4780")
         assertThat(packets.sumOf { it.packetVersionSum }).isEqualTo(31)
     }
 
@@ -105,7 +105,56 @@ internal class PacketsTest {
 
     @Test
     fun `puzzle solution 1`() {
-        val packets = Packets.parseInput(puzzleInput).parse()
+        val packets = parseWholePacket(puzzleInput)
         assertThat(packets.sumOf { it.packetVersionSum }).isEqualTo(981)
     }
+
+    @Test
+    fun `example sum 1`() {
+        assertThat(parseWholePacket("C200B40A82").sum).isEqualTo(3)
+    }
+
+    @Test
+    fun `example sum 2`() {
+        assertThat(parseWholePacket("04005AC33890").sum).isEqualTo(54)
+    }
+
+    @Test
+    fun `example sum 3`() {
+        assertThat(parseWholePacket("880086C3E88112").sum).isEqualTo(7)
+    }
+
+    @Test
+    fun `example sum 4`() {
+        assertThat(parseWholePacket("CE00C43D881120").sum).isEqualTo(9)
+    }
+
+    @Test
+    fun `example sum 5`() {
+        assertThat(parseWholePacket("D8005AC2A8F0").sum).isEqualTo(1)
+    }
+
+    @Test
+    fun `example sum 6`() {
+        assertThat(parseWholePacket("F600BC2D8F").sum).isEqualTo(0)
+    }
+
+    @Test
+    fun `example sum 7`() {
+        assertThat(parseWholePacket("9C005AC2F8F0").sum).isEqualTo(0)
+    }
+
+    @Test
+    fun `example sum 8`() {
+        assertThat(parseWholePacket("9C0141080250320F1802104A08").sum).isEqualTo(1)
+    }
+
+    @Test
+    fun `puzzle solution 2`() {
+        assertThat(parseWholePacket(puzzleInput).sum).isEqualTo(299227024091)
+    }
+
+    private fun parseWholePacket(input: String) = Packets.parseInput(input).parse()
+
+    private val List<Packet>.sum get() = sumOf { it.sum }
 }

@@ -9,6 +9,8 @@ sealed class Packet {
     abstract val type: Int
     abstract val packetVersionSum: Int
 
+    abstract val sum: Long
+
     data class SubPacket(
         override val version: Int,
         override val type: Int,
@@ -17,11 +19,42 @@ sealed class Packet {
     ) : Packet() {
 
         override val packetVersionSum = version + packets.sumOf { it.packetVersionSum }
+        override val sum: Long by lazy {
+            when (type) {
+                0 -> packets.sumOf { it.sum }
+                1 -> packets.fold(1L) { acc, it -> acc * it.sum }
+                2 -> packets.minOf { it.sum }
+                3 -> packets.maxOf { it.sum }
+                5 -> {
+                    check(packets.size == 2) {
+                        "Packet of type 5 expected to have exactly 2 sub packets but has: ${packets.size}"
+                    }
+                    val (f, s) = packets
+                    if (f.sum > s.sum) 1 else 0
+                }
+                6 -> {
+                    check(packets.size == 2) {
+                        "Packet of type 6 expected to have exactly 2 sub packets but has: ${packets.size}"
+                    }
+                    val (f, s) = packets
+                    if (f.sum < s.sum) 1 else 0
+                }
+                7 -> {
+                    check(packets.size == 2) {
+                        "Packet of type 7 expected to have exactly 2 sub packets but has: ${packets.size}"
+                    }
+                    val (f, s) = packets
+                    if (f.sum == s.sum) 1 else 0
+                }
+                else -> error("Unknown packet type $type")
+            }
+        }
     }
 
     data class LiteralValue(override val version: Int, val value: Long) : Packet() {
         override val type = 4
         override val packetVersionSum = version
+        override val sum = value
     }
 }
 
