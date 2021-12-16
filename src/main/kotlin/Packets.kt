@@ -25,28 +25,20 @@ sealed class Packet {
                 1 -> packets.fold(1L) { acc, it -> acc * it.sum }
                 2 -> packets.minOf { it.sum }
                 3 -> packets.maxOf { it.sum }
-                5 -> {
+                5, 6, 7 -> {
                     check(packets.size == 2) {
-                        "Packet of type 5 expected to have exactly 2 sub packets but has: ${packets.size}"
+                        "Packet of type $type expected to have exactly 2 sub packets but has: ${packets.size}"
                     }
                     val (f, s) = packets
-                    if (f.sum > s.sum) 1 else 0
-                }
-                6 -> {
-                    check(packets.size == 2) {
-                        "Packet of type 6 expected to have exactly 2 sub packets but has: ${packets.size}"
+                    val comparisonOk = when (type) {
+                        5 -> f.sum > s.sum
+                        6 -> f.sum < s.sum
+                        7 -> f.sum == s.sum
+                        else -> error("Unexpected packet type $type")
                     }
-                    val (f, s) = packets
-                    if (f.sum < s.sum) 1 else 0
+                    if (comparisonOk) 1 else 0
                 }
-                7 -> {
-                    check(packets.size == 2) {
-                        "Packet of type 7 expected to have exactly 2 sub packets but has: ${packets.size}"
-                    }
-                    val (f, s) = packets
-                    if (f.sum == s.sum) 1 else 0
-                }
-                else -> error("Unknown packet type $type")
+                else -> error("Invalid packet type $type")
             }
         }
     }
