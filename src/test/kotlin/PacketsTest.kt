@@ -21,9 +21,10 @@ internal class PacketsTest {
         val packets = "00111000000000000110111101000101001010010001001000000000".parse()
         assertThat(packets).hasSize(1)
         assertThat(packets.first()).isEqualTo(
-            Packet.BitSubPacket(
+            Packet.SubPacket(
                 version = 1,
                 type = 6,
+                typeId = 0,
                 packets = listOf(
                     Packet.LiteralValue(version = 6, value = 10),
                     Packet.LiteralValue(version = 2, value = 20),
@@ -37,9 +38,10 @@ internal class PacketsTest {
         val packets = "11101110000000001101010000001100100000100011000001100000".parse()
         assertThat(packets).hasSize(1)
         assertThat(packets.first()).isEqualTo(
-            Packet.LenSubPacket(
+            Packet.SubPacket(
                 version = 7,
                 type = 3,
+                typeId = 1,
                 packets = listOf(
                     Packet.LiteralValue(version = 2, value = 1),
                     Packet.LiteralValue(version = 4, value = 2),
@@ -54,17 +56,20 @@ internal class PacketsTest {
         val packets = Packets.parseInput("8A004A801A8002F478").parse()
         assertThat(packets).isEqualTo(
             listOf(
-                Packet.LenSubPacket(
+                Packet.SubPacket(
                     version = 4,
                     type = 2,
+                    typeId = 1,
                     packets = listOf(
-                        Packet.LenSubPacket(
+                        Packet.SubPacket(
                             version = 1,
                             type = 2,
+                            typeId = 1,
                             packets = listOf(
-                                Packet.BitSubPacket(
+                                Packet.SubPacket(
                                     version = 5,
                                     type = 2,
+                                    typeId = 0,
                                     packets = listOf(Packet.LiteralValue(version = 6, value = 15))
                                 )
                             )

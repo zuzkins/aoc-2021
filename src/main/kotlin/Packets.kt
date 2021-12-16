@@ -9,22 +9,12 @@ sealed class Packet {
     abstract val type: Int
     abstract val packetVersionSum: Int
 
-    data class BitSubPacket(
+    data class SubPacket(
         override val version: Int,
         override val type: Int,
         val packets: List<Packet>,
+        val typeId: Int,
     ) : Packet() {
-        val typeId = 0
-
-        override val packetVersionSum = version + packets.sumOf { it.packetVersionSum }
-    }
-
-    data class LenSubPacket(
-        override val version: Int,
-        override val type: Int,
-        val packets: List<Packet>,
-    ) : Packet() {
-        val typeId = 1
 
         override val packetVersionSum = version + packets.sumOf { it.packetVersionSum }
     }
@@ -108,9 +98,9 @@ object Packets {
         val typeId = this.take(1)
         val restTypeId = this.drop(1)
         return if (typeId == "0") {
-            restTypeId.parseBitSubPacket(version, type)
+            restTypeId.parseBitSubPacket(version, type, typeId.toInt())
         } else if (typeId == "1") {
-            restTypeId.parseLenSubPacket(version, type)
+            restTypeId.parseLenSubPacket(version, type, typeId.toInt())
         } else {
             error("can only parse sub packets '0'")
         }
@@ -119,14 +109,16 @@ object Packets {
     private fun BinaryString.parseBitSubPacket(
         version: Int,
         type: Int,
-    ): Pair<Packet.BitSubPacket, BinaryString> {
+        typeId: Int,
+    ): Pair<Packet.SubPacket, BinaryString> {
         val bitLen = take(15).intFromBinary()
         val packetsBase = drop(15).take(bitLen)
         val restPacket = drop(15 + bitLen)
         val packets = packetsBase.parse()
-        return Packet.BitSubPacket(
+        return Packet.SubPacket(
             version = version,
             type = type,
+            typeId = typeId,
             packets = packets
         ) to restPacket
     }
@@ -134,13 +126,15 @@ object Packets {
     private fun BinaryString.parseLenSubPacket(
         version: Int,
         type: Int,
-    ): Pair<Packet.LenSubPacket, BinaryString> {
+        typeId: Int,
+    ): Pair<Packet.SubPacket, BinaryString> {
         val packetCount = take(11).intFromBinary()
         val restPacket = drop(11)
         val (packets, rest) = restPacket.doParse(maxPackets = packetCount)
-        return Packet.LenSubPacket(
+        return Packet.SubPacket(
             version = version,
             type = type,
+            typeId = typeId,
             packets = packets
         ) to rest
     }
