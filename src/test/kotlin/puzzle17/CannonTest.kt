@@ -112,6 +112,7 @@ internal class CannonTest {
         val shot = shots.highestShot()
         assertThat(shot.first()).isEqualTo(6 to 9)
         assertThat(shot.maxOf { it.second }).isEqualTo(45)
+        assertThat(shots).hasSize(112)
     }
 
     @Test
@@ -119,6 +120,7 @@ internal class CannonTest {
         val shots = puzzleTarget.showerThemWithNukes()
         val shot = shots.highestShot()
         assertThat(shot.maxOf { it.second }).isEqualTo(4851)
+        assertThat(shots).hasSize(1739)
     }
 
 

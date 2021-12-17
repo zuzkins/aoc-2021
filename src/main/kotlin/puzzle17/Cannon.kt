@@ -32,9 +32,12 @@ object Cannon {
     }
 
     fun Target.showerThemWithNukes(): List<List<Point>> {
+        check(x.first >= 0) {
+            "This cannon cannot shoot to the left side! :("
+        }
         val result = LinkedList<List<Point>>()
         (0..1000).forEach { initialX ->
-            (0..1000).forEach { initialY ->
+            (-1000..1000).forEach { initialY ->
                 val shot = this.shootWith(initialX, initialY)
                 if (shot.isNotEmpty()) {
                     result.add(shot)
