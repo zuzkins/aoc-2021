@@ -1,3 +1,7 @@
+package puzzle16
+
+import Packet
+import Packets
 import Packets.parse
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
