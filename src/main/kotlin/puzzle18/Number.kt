@@ -49,6 +49,8 @@ data class SnailNumberToExplode(val parent: SnailNumber.Node, val number: SnailN
 sealed class SnailNumber {
     abstract fun print(): String
 
+    abstract val magnitude: Long
+
     data class Node(var left: SnailNumber, var right: SnailNumber) : SnailNumber() {
         override fun print() = "[${left.print()},${right.print()}]"
         fun reset(number: Node) {
@@ -62,10 +64,19 @@ sealed class SnailNumber {
         operator fun plus(other: Node): Node {
             return Node(left = this, right = other)
         }
+
+        override val magnitude: Long
+            get() {
+                val lm = left.magnitude
+                val rm = right.magnitude
+                val m = 3L * lm + 2L * rm
+                return m
+            }
     }
 
     data class Number(var value: Int) : SnailNumber() {
         override fun print() = value.toString()
+        override val magnitude: Long get() = value.toLong()
     }
 }
 
@@ -123,36 +134,32 @@ object SnailMathUtil {
         }.map { (n, p) -> SnailNumberToSplit(p, n) }
     }
 
-    fun SnailNumber.Node.findNextReduceOp(level: Int = 0): SnailNumberReduceOp? {
-        val l = left
-        val r = right
+    fun SnailNumber.Node.findNextReduceOperation(): SnailNumberReduceOp? {
+        val explode = findNumbersToExplode()
+        if (explode.isNotEmpty()) return explode.first()
+        return findNumbersToSplit().firstOrNull()
+    }
 
-        if (level == 3) {
-            val children = listOf(l, r).filterIsInstance<SnailNumber.Node>()
-            check(
-                children.all { n ->
-                    n.left is SnailNumber.Number && n.right is SnailNumber.Number
-                }
-            )
-            if (children.isNotEmpty()) {
-                return SnailNumberToExplode(parent = this, number = children.first())
-            }
+    fun SnailNumber.Node.reduce(): SnailNumber.Node {
+        var counter = 1
+        var op = findNextReduceOperation()
+        while (op != null) {
+            op.reduceStep(this)
+            // println("${counter.toString().padStart(2, '0')}${op::class.simpleName}\t\t${this.print()}")
+            op = findNextReduceOperation()
+            counter++
         }
-        if (l is SnailNumber.Number && l.value > 9) {
-            return SnailNumberToSplit(this, l)
+        return this
+    }
+
+    fun List<SnailNumber.Node>.snailSum(): SnailNumber.Node {
+        val start = first()
+        val result = drop(1).fold(start) { acc, n ->
+            val res = acc + n
+            res.reduce()
+            res
         }
-        if (l is SnailNumber.Node) {
-            val op = l.findNextReduceOp(level + 1)
-            if (op != null) return op
-        }
-        if (r is SnailNumber.Number && r.value > 9) {
-            return SnailNumberToSplit(this, r)
-        }
-        if (r is SnailNumber.Node) {
-            val op = r.findNextReduceOp(level + 1)
-            if (op != null) return op
-        }
-        return null
+        return result
     }
 
     fun String.parseSnailNumber(): SnailNumber.Node {
