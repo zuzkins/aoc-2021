@@ -131,4 +131,16 @@ internal class ImageEnhancementTest {
         println(e2.print() + "\n\n\n\n")
         assertThat(e2.countPixels().second).isEqualTo(4928)
     }
+
+    @Test
+    fun `puzzle solution 2`() {
+        var i = puzzleImage()
+
+        (0 until 50).forEach { step ->
+            val bgFlipped = if (step % 2 == 0) 0 else 1
+            i = i.enhance(puzzleEnhancedMap, default = bgFlipped)
+        }
+
+        assertThat(i.countPixels().second).isEqualTo(16605)
+    }
 }
