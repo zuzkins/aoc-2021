@@ -18,27 +18,27 @@ internal class DiracDiceTest {
             startingPosition = 4,
             playground = 10,
         )
-        p1.move(1, 2, 3).also {
+        p1.move(1 + 2 + 3).also {
             assertThat(it.currentPosition).isEqualTo(10)
             assertThat(it.score).isEqualTo(10)
-        }.move(7, 8, 9).also {
+        }.move(7 + 8 + 9).also {
             assertThat(it.currentPosition).isEqualTo(4)
             assertThat(it.score).isEqualTo(14)
-        }.move(13, 14, 15).also {
+        }.move(13 + 14 + 15).also {
             assertThat(it.currentPosition).isEqualTo(6)
             assertThat(it.score).isEqualTo(20)
-        }.move(19, 20, 21).also {
+        }.move(19 + 20 + 21).also {
             assertThat(it.currentPosition).isEqualTo(6)
             assertThat(it.score).isEqualTo(26)
         }
     }
 
+    val exampleP1 = DiracDicePlayer(startingPosition = 4)
+    val exampleP2 = DiracDicePlayer(startingPosition = 8)
+
     @Test
     fun `can play game`() {
-        val p1 = DiracDicePlayer(startingPosition = 4)
-        val p2 = DiracDicePlayer(startingPosition = 8)
-
-        val game = DiracDiceGame(players = listOf(p1, p2), dice = deterministicDice())
+        val game = DiracDiceGame(players = listOf(exampleP1, exampleP2), dice = deterministicDice())
 
         val winningGame = game.play().last()
         val (winner, loser) = winningGame.players
@@ -61,5 +61,17 @@ internal class DiracDiceTest {
         val winner = winningGame.winner()
         assertThat(winner).isNotNull
         assertThat(winningGame.score()).isEqualTo(888735)
+    }
+
+    @Test
+    fun `example solution 2`() {
+        val result = QuantumDiracDiceGame(exampleP1, exampleP2).play()
+        assertThat(result.first).isEqualTo(444356092776315)
+    }
+
+    @Test
+    fun `puzzle solution 2`() {
+        val result = QuantumDiracDiceGame(puzzleP1, puzzleP2).play()
+        assertThat(result.first).isEqualTo(647608359455719)
     }
 }

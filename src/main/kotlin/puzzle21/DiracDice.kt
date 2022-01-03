@@ -8,11 +8,10 @@ data class DiracDicePlayer(
 ) {
 
     fun move(roll: Triple<Int, Int, Int>): DiracDicePlayer {
-        return move(roll.first, roll.second, roll.third)
+        return move(roll.first + roll.second + roll.third)
     }
 
-    fun move(a: Int, b: Int, c: Int): DiracDicePlayer {
-        val m = a + b + c
+    fun move(m: Int): DiracDicePlayer {
         val nextPos = (currentPosition + m) % 10
         val finalPos = if (nextPos == 0) {
             10
@@ -74,6 +73,47 @@ data class DiracDiceGame(val players: List<DiracDicePlayer>, val dice: Dice) {
             }
         }
         return seq
+    }
+}
+
+val quantumRolls = (1..3).flatMap { r1 ->
+    (1..3).flatMap { r2 ->
+        (1..3).map { r3 ->
+            r1 + r2 + r3
+        }
+    }
+}.groupingBy { it }.eachCount()
+
+typealias WinCounter = Pair<Long, Long>
+
+private val P1Win = 1L to 0L
+private val P2Win = 0L to 1L
+
+private fun rollOrder() = generateSequence(true) { !it }.asIterable()
+
+private operator fun WinCounter.plus(other: WinCounter): WinCounter =
+    this.first + other.first to this.second + other.second
+
+private operator fun WinCounter.times(universes: Int) = this.first * universes to this.second * universes
+
+// 444356092776315L
+//  42514214244212L
+
+data class QuantumDiracDiceGame(val p1: DiracDicePlayer, val p2: DiracDicePlayer, val p1Turn: Boolean = true) {
+
+    fun play(): WinCounter {
+        return when {
+            p1.score >= 21 -> P1Win
+            p2.score >= 21 -> P2Win
+            else -> quantumRolls.entries.map { (roll, universesCount) ->
+                val (np1, np2) = if (p1Turn) {
+                    p1.move(roll) to p2
+                } else {
+                    p1 to p2.move(roll)
+                }
+                QuantumDiracDiceGame(np1, np2, !p1Turn).play() * universesCount
+            }.reduce { acc, n -> acc + n }
+        }
     }
 }
 
