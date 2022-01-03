@@ -1,17 +1,17 @@
 package puzzle21
 
 data class DiracDicePlayer(
-    var startingPosition: Int,
+    val startingPosition: Int,
     val playground: Int = 10,
-    var currentPosition: Int = startingPosition,
-    var score: Int = 0
+    val currentPosition: Int = startingPosition,
+    val score: Int = 0
 ) {
 
-    fun move(roll: Triple<Int, Int, Int>) {
-        move(roll.first, roll.second, roll.third)
+    fun move(roll: Triple<Int, Int, Int>): DiracDicePlayer {
+        return move(roll.first, roll.second, roll.third)
     }
 
-    fun move(a: Int, b: Int, c: Int) {
+    fun move(a: Int, b: Int, c: Int): DiracDicePlayer {
         val m = a + b + c
         val nextPos = (currentPosition + m) % 10
         val finalPos = if (nextPos == 0) {
@@ -19,8 +19,10 @@ data class DiracDicePlayer(
         } else {
             nextPos
         }
-        currentPosition = finalPos
-        score += finalPos
+        return copy(
+            currentPosition = finalPos,
+            score = score + finalPos
+        )
     }
 }
 
@@ -34,19 +36,23 @@ class Dice(seq: Sequence<Int>, var rolledCount: Int = 0) {
 
 data class DiracDiceGame(val players: List<DiracDicePlayer>, val dice: Dice) {
 
-    fun nextRound(): Boolean {
-        players.forEach { p ->
-            val roll = dice.roll()
-            p.move(roll)
-            if (isWinner(p)) {
-                return true
+    fun nextRound(): Pair<DiracDiceGame, Boolean> {
+        var winner = false
+        val newPlayers = players.map { p ->
+            if (winner) {
+                p
+            } else {
+                val roll = dice.roll()
+                val nextPlayer = p.move(roll)
+                winner = isWinner(nextPlayer)
+                nextPlayer
             }
         }
-        return false
+        return copy(players = newPlayers) to winner
     }
 
-    fun winner(): DiracDicePlayer? {
-        return players.firstOrNull { isWinner(it) }
+    fun winner(): DiracDicePlayer {
+        return players.firstOrNull { isWinner(it) } ?: error("Game has no winner")
     }
 
     private fun isWinner(p: DiracDicePlayer) = p.score >= 1000
@@ -54,6 +60,20 @@ data class DiracDiceGame(val players: List<DiracDicePlayer>, val dice: Dice) {
     fun score(): Int {
         val losingScore = players.minOf { it.score }
         return losingScore * dice.rolledCount
+    }
+
+    fun play(): Sequence<DiracDiceGame> {
+        var finished = false
+        val seq = generateSequence(this) {
+            if (finished) {
+                null
+            } else {
+                val (game, winner) = it.nextRound()
+                finished = winner
+                game
+            }
+        }
+        return seq
     }
 }
 
